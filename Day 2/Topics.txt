@@ -1,0 +1,53 @@
+Include Boostrap CSS framework
+
+Topics
+-------
+
+	Task Manager Project
+	--------------------
+	tasks/ -> list of tasks
+	tasks/{id} -> Task Details
+	tasks/{id}/edit -> Task Edit
+	
+	user/login
+	user/register
+	
+	
+Route ::get()	
+
+@include -- Including the blade template into the master file
+redirect()
+url() -> route();
+
+
+Blade Helper Functions
+	@include
+	@extends
+	@section
+	@foreach
+	
+	
+Directive
+	Route
+	Resource
+	App/Http/Controller
+	
+	
+Blades Files
+	TAsks
+	Users
+
+@include
+
+url('')
+
+
+Controller :- php artisan make:controller
+Migration:- User Table php artisan make:migration create_users_table
+Models: use the predefined model, 
+	How to create a model 
+	Task Table
+	
+	
+	
+
