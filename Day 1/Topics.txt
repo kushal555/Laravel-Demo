@@ -1,0 +1,34 @@
+Project Part:
+-------------
+
+
+Artisan Commands
+----------------
+	- php artisan serve => Start server in local machine
+
+
+Helpers
+-------
+	- view() => It will point the code to Resource/View 
+
+
+Blade Template:
+---------------
+	@extends()
+	@yield()
+	@section()
+
+
+Directories:
+------------
+	Routes => That is routes of the laravel
+	Resource => That have all the assets js and css files and also have view files  
+
+Install laravel
+---------------
+
+
+	/ => Personal Details
+	/projects => Projects 
+	/contact => Contacts
+	
