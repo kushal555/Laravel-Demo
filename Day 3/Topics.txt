@@ -1,3 +1,7 @@
+.env
+-----
+	- settings for your current envrionment
+
 Laravel Commands:
 -----------------
 laravel new <project-name>
@@ -8,12 +12,45 @@ php artisan serve
 php artisan route:list
 
 php artisan make:controller <controller-name>
+php artisan make:model <model-name> [--migration]
+
+php artisan make:migration <migration-name> 
+php artisan migrate
+php artisan migrate:refresh - rollback and then migrate again
+php artisan migrate:fresh - drop all the tabls and then migrate again
+php artisan migrate:rollback
+
+php artisan tinker
+
+Eloquent Model Methods:
+-----------------------
+	all()  - gives us a collection of all the objects (records in table)
+	find() - if we pass just the id, find() gives us an object (model) (one record from the table)
+		 if we pass a condition ['completed' => false] we get a collection of objects (records in the table)
+	create() - pending
+	
+Alternate create/edit operation:
+--------------------------------
+- Create a model
+	php artisan make:model Task 
+- Instantiate that model
+	$task = new Task();
+
+- Add properties to that instance
+	$task->title = 'Learn Eloquent';
+	$task->description = 'This is to learn Eloquent';
+
+- Save the instance
+	$task->save();
 
 Helpers:
 --------
 view() - Render a View
 redirect() - Redirect to a route
 url() - Gives you an absolute url
+asset() - Gives the asset url
+back() - Redirects you to the previous page.
+dd() - die and dump function
 
 Blade Template:
 ---------------
@@ -25,6 +62,8 @@ Blade Template:
 @section @endsection/@stop
 @yield
 
+@csrf
+
 Route:
 ------
  get()
@@ -33,11 +72,17 @@ Route:
  patch()
  delete()
 
+Request $request:
+-----------------
+ ->all();
+ ->get();
+
 Directories:
 ------------
 routes  - Web and API related Routing
 resources/views - Views of our MVC architecture
 app/http/controllers - All the Controllers in your system
+database/migrations - 
 
 
 ========================================================================================
@@ -66,6 +111,7 @@ Useful Links:
 HTML Entities: https://dev.w3.org/html5/html-author/charref
 PHP : https://www.php.net/manual/en/
 Resrouce Controllers: https://laravel.com/docs/6.x/controllers#resource-controllers
+Migration Datatypes: https://laravel.com/docs/5.8/migrations#creating-columns
 
 -------------------------------------------------------
 
