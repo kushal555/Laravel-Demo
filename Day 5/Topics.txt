@@ -1,0 +1,237 @@
+.env
+-----
+	- settings for your current envrionment
+
+Laravel Commands:
+-----------------
+laravel new <project-name>
+
+Artisan:
+--------
+php artisan serve
+php artisan route:list
+
+php artisan make:controller <controller-name>
+php artisan make:model <model-name> [--migration]
+php artisan make:middleware <middleware-name>
+
+php artisan make:migration <migration-name> 
+php artisan migrate
+php artisan migrate:refresh - rollback and then migrate again
+php artisan migrate:fresh - drop all the tabls and then migrate again
+php artisan migrate:rollback
+
+php artisan tinker
+
+Eloquent Model Methods:
+-----------------------
+	all()  - gives us a collection of all the objects (records in table)
+	find() - if we pass just the id, find() gives us an object (model) (one record from the table)		 
+	create() - use for mass assignment (but it only works for $fillable fields of model)
+	where() - if we pass a condition ['completed' => false] we get a collection of objects (records in the table)
+	 - limit() 
+	 - get()
+	
+	 - first() - 1 object is obtained
+
+Model Class:
+------------
+protected $fillable - allows you to do mass assignment of fields that are the part of the array
+protected $hidden - allows you to hide certain fields while find()/all()/get() operations
+belongsTo() - Ex: A Task belongs to A User
+hasMany() - Ex: A User has many Tasks
+	
+Alternate create/edit operation:
+--------------------------------
+- Create a model
+	php artisan make:model Task 
+- Instantiate that model
+	$task = new Task();
+
+- Add properties to that instance
+	$task->title = 'Learn Eloquent';
+	$task->description = 'This is to learn Eloquent';
+
+- Save the instance
+	$task->save();
+
+Helpers:
+--------
+view() - Render a View
+redirect() - Redirect to a route
+url() - Gives you an absolute url
+asset() - Gives the asset url
+back() - Redirects you to the previous page.
+dd() - die and dump function
+session() - a layer on top of $_SESSION
+old() - old values for the form
+
+Blade Template:
+---------------
+@include()
+@foreach() @endforeach
+@if() @else @elseif @endif
+@error() @enderror  - ($message becomes available inside @error())
+
+@extends
+@section @endsection/@stop
+@yield
+
+@csrf
+
+Route:
+------
+ get()
+ post()
+ put()
+ patch()
+ delete()
+
+Request $request:
+-----------------
+ ->all();
+ ->get();
+ ->session()
+	->get()
+  	->push()
+	->flash()
+	->all()
+  ->validate()
+
+$errors: All the errors are flash messages
+--------
+ ->any() - true/false if errors are there or not
+ ->all() - array of all the error messages
+
+Directories:
+------------
+routes  - Web and API related Routing
+resources/views - Views of our MVC architecture
+app/http/controllers - All the Controllers in your system
+app/http/middleware
+database/migrations - 
+
+Middleware:
+-----------
+Routing Level 
+	- Route::get(...)->middleware('name-of-middleware');
+Controller Level 
+	- public function __construct() {
+		$this->middleware('name-of-middleware');
+	  }
+
+========================================================================================
+
+Laravel: PHP Framework (MVC)
+-----------------------------
+Views		- Blade Templating
+Modles		- Eloquent Model
+Controllers	- 
+
+Routing
+-----------------------------
+
+REST Protocol:
+--------------
+HTTP Verbs
+GET		- Get Data from the server
+POST		- Add Data to the server
+PUT		- Update Data to the server (Full Update)
+DELETE  	- Delete Data from the server
+PATCH		- Update Data to the server (Partial Update)
+
+
+Useful Links: 
+-------------
+HTML Entities: https://dev.w3.org/html5/html-author/charref
+PHP : https://www.php.net/manual/en/
+Resrouce Controllers: https://laravel.com/docs/6.x/controllers#resource-controllers
+Migration Datatypes: https://laravel.com/docs/5.8/migrations#creating-columns
+Available Laravel Validations: https://laravel.com/docs/6.x/validation#available-validation-rules
+
+Usage of Sessions in PHP:
+-------------------------
+- Message Passing
+- Authentication
+
+Core PHP Functions:
+-------------------
+compact()
+md5()
+unset()
+isset()
+
+-------------------------------------------------------
+
+Task Manager Routes:
+--------------------
+
+GET - /tasks/add - Task Form UI
+GET - /tasks/list - Task List UI
+GET - /tasks/{id}/detail - Task Detail UI
+GET - /tasks/{id}/edit - Task Edit UI
+
+GET - /login - Login Form UI
+GET - /register - Register Form UI
+
+POST - /tasks/add - Task Add Process
+GET  - /tasks/{id}/delete - Task Delete Process
+POST - /tasks/{id}/update - Task Update Process
+GET  - /tasks/{id}/status - Task Complete/Undo Process
+
+POST - /login - Login Process
+POST - /register - Register Process
+
+Task Manager:
+-------------
+Users:
+------
+- Register to our system
+- Login to our system and Logout (only if the user is activated)
+- User can add tasks (after logging in)
+- User can list the tasks that he/she added
+- User can delete a task
+- User can mark task as complete and undo that operation
+- User can edit a task
+- User can view the task Detail
+- User can check the stats on a Dashboard (http://www.flotcharts.org/flot/examples/series-pie/index.html)
+
+Filters:
+--------
+- Date Filter - with popup calendar where user can select a specific date (first of current month)
+- All/Completed/Incomplete Tasks Filter (Link dashboard buttons to respective filters)
+
+Admin:
+------
+- Login to our system and Logout
+- Admin can see the list of users
+- Admin can activate/deactivate the users
+- Admin can have a backdoor entry to other user's portal
+
+
+Agenda:
+-------
+- Establishing Relationship between entities: user and task (one user can have many tasks)
+- User can add/edit/delete/list only his/her own tasks.
+- Dashboard Controller, View, Route
+
+
+----------------------
+
+column for users
+is_admin => boolean false
+is_active => boolean true
+
+
+middleware => is_admin => redirecet it to Dashbaord 
+
+	- Users list >  inactive/deactive / disable
+	- tasks list with user - name
+	
+User Controller 
+	-> loginCheck method => is_active=> true
+	
+
+	name routes
+
+Mix/ Elixir	
