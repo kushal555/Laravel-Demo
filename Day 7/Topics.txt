@@ -1,0 +1,32 @@
+
+1. Authentication
+-----------------
+
+ - 5 Hours
+ - 1 minute
+
+
+2. Service Container 
+-----------------
+3. Service Provider
+-----------------
+
+username:- kipewasib
+
+Stripe payment gateway
+
+
+
+Class Stripe {
+
+	protected $apikey;
+	
+	public function __construct($apikey){
+		$this->apikey = $apikey;
+	}
+}
+
+
+$stripe = Stripe('adfsdafasdfas');
+$stripe = Stripe('adfsdafasdfas');
+$stripe = Stripe('adfsdafasdfas');
