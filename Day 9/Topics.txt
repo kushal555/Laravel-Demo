@@ -1,0 +1,7 @@
+Post Image upload
+	- Local 
+	- S3
+	
+Google Login 
+------------
+	- Create thumb of image
