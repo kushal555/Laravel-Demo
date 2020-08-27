@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Intervention\Image\Facades\Image;
 
 class PostController extends Controller
 {
@@ -46,7 +47,10 @@ class PostController extends Controller
         if($request->hasFile('image')){
             // upload file on the server/local system
            $image_path = $request->image->store('posts','public');
+           $image = Image::make($request->image->getRealPath())->fit(400);
+            $image->save('storage/thumbnails/'.$image_path);
             $data['image'] = $image_path;
+            $data['driver_type'] = 'local';
         }
 //        $data['user_id'] = Auth::user()->id;
 //        Post::create($data);

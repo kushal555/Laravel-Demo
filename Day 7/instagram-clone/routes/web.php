@@ -11,9 +11,6 @@
 |
 */
 
-dd(config('database.connections.sqlite.database'));
-dd(resolve('\App\Stripe'));
-
 Route::get('/', function () {
     $users = \App\User::all();
     return view('welcome');
