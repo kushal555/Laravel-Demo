@@ -1,0 +1,32 @@
+1. Mail
+	-> Register ->
+	-> Post created
+	-> Password Reset
+	
+2. Authrization
+---------------
+	Gates 
+	Route::get('show-post',function(){
+	
+	});
+	
+	User
+	
+	Policies/UserPolicy
+	
+	Polcies/POstPolicy
+	
+	
+	policy-status => active / inactive
+	
+3. Soft Delete
+--------------
+
+1. User 
+	=> 8 followers
+	=> 8 emails
+	
+	Followers
+		=> follow_by => follower
+		=> follow_to => user
+	
