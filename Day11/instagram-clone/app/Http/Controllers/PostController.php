@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\PostCreated;
+use App\Mail\PostCreatedNotification;
+use App\Events\PostCreatedNotification as PostEvent;
 use App\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Mail;
 use Intervention\Image\Facades\Image;
 
 class PostController extends Controller
@@ -44,27 +48,22 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        $data  = $request->validate([
-            'title' => ['required'],
-            'description' => ['required','min:50'],
-            'image'=>['required','image'],
-            'hashtag' => ['required']
-        ]);
+        $post = Post::first(); // we successfully create a post
+        $followers = $post->user->followers;
+        $follower = $followers->first();
 
-        if($request->hasFile('image')){
-            // upload file on the server/local system
-           $image_path = $request->image->store('posts','public');
-           $image = Image::make($request->image->getRealPath())->fit(400);
-            $image->save('storage/thumbnails/'.$image_path);
-            $data['image'] = $image_path;
-            $data['driver_type'] = 'local';
-        }
-//        $data['user_id'] = Auth::user()->id;
-//        Post::create($data);
-        Auth::user()->posts()->create($data);
 
-        return redirect('/');
+        $mailContent = collect([]);
+        $mailContent->put('title' , $post->title);
+        $mailContent->put('created_by' ,$post->user->name);
+        $mailContent->put('follower',$follower->followBy->email);
+//        $mailContent->follower = $follower->followBy->email;
 
+//        dd($mailContent);
+
+        event(new PostEvent($mailContent));
+        $posts = Post::with('user','user.profile')->latest()->get();
+        return view('home',compact('posts'));
     }
 
     /**

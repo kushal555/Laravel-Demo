@@ -21,3 +21,12 @@
 	
 3. Soft Delete
 --------------
+
+1. User 
+	=> 8 followers
+	=> 8 emails
+	
+	Followers
+		=> follow_by => follower
+		=> follow_to => user
+	
