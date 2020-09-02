@@ -1,0 +1,135 @@
+Artisan Command
+---------------
+
+	make the deploy command,
+	- php artisan cache:clear
+	- php artisan view:clear
+	- php artisan route:clear
+	- php artisan migrate
+	- composer dump-autoload
+	- npm run dev/pro  - depend on the param/env 
+	- php artisan serve
+
+UseFull :- https://laravel.com/docs/5.8/artisan
+
+Subscription
+------------
+
+Subscription
+------------
+We will use Stripe to take subscriptions and use Laravel's Cashier to make it rather easy. 
+This will go into more template and Stripe details rather than Laravel docs.
+
+	- composer required laravel/cashier 10.7  => Version should be fixed.
+	- php artisan migrate => to run the Subscription table and customer id
+	- use Laravel\Cashier\Billable;
+
+		class User extends Authenticatable
+		{
+			use Billable;
+		}
+		
+		Add Billable to our user model 
+	
+	- CASHIER_MODEL=App\User => if you wish you change the default model for cashier
+	
+	-  STRIPE_KEY=pk_test_CoQG7tk7ipJYa9i4lL36O4nS00OKNrKNgh
+	   STRIPE_SECRET=sk_test_0ndLDlzCHOeeB1ykvvkDYnqk009oHZ6ptJ   => secret key always have sk
+	   
+	- Let's craete a Payment Controller with Index action, By the way Payment module always be accessible for logged in user only
+		if you visiting the laravel site, we need to pass the intent to view;
+		
+		$stripe  =new StripeClient(env('STRIPE_SECRET'));
+		dd($stripe->products->all(['limit' => 3]));  //prod_HpywI0w5CPMATZ
+        $plans = $stripe->prices->all(['product' => 'prod_HpywI0w5CPMATZ'])->data;
+		return view('payments.index',[
+            'intent' => auth()->user()->createSetupIntent(),
+            'plans' => $plans
+        ]);
+		 
+		 
+	- Now create a route for that.
+		Route::get('payment/make','PaymentController@index');
+	- Let create a blade file for that action and put the code which showing into the Laravel docs.
+	- Now we need to do some changes in our layout file 
+		put the header section so we can easily inject the cdn library of stripe
+		put the js section so we can put our js code there.
+	- Now just copy the code of the JS from Laravel website, So we can put the header section to including the js file
+		@section('header')<script src="https://js.stripe.com/v3/"></script>@endsection
+	- Put the jS section code into the js section, for that we have to put the window.eventListerner('load',()=>{});.
+		Because we don't want to execute our js code until the js libraries not loaded completely
+		
+		
+		window.addEventListener('load',()=>{
+            const stripe = Stripe( '{{ env('STRIPE_KEY') }}');
+
+            const elements = stripe.elements();
+            const cardElement = elements.create('card');
+
+            cardElement.mount('#card-element');
+            const cardHolderName = document.getElementById('card-holder-name');
+            const cardButton = document.getElementById('card-button');
+            const clientSecret = cardButton.dataset.secret;
+
+            cardButton.addEventListener('click', async (e) => {
+                const { setupIntent, error } = await stripe.handleCardSetup(
+                    clientSecret, cardElement, {
+                        payment_method_data: {
+                            billing_details: { name: cardHolderName.value }
+                        }
+                    }
+                );
+
+                if (error) {
+                    // Display "error.message" to the user...
+                } else {
+                   console.log(' Card is verified',setupIntent.payment_method)
+                }
+            });
+        });
+
+	- Let's mae a action into the PaymentController for subscribe and create a new sbuscribe
+	
+	- Now let;s go to the Stripe Dashboard and let create a Product and plans for that.
+	
+	- By the way we can grabs all the prices related to our product.
+		$stripe  =new StripeClient(env('STRIPE_SECRET'));
+		//dd($stripe->products->all(['limit' => 3]));  //prod_HpywI0w5CPMATZ
+	- Pass this plans to our blade file
+	- Let's create a route to handle the payment method submit data.
+		Route::post('payment/subscribe','PaymentController@subscribe');
+	- In JS side, we can use the Ajax call to sending the form to server side, but again laravel always comes with good inbuild features 
+		it has axios that is library for async request.
+	-  we can defined the axios call inside the success event of the code.
+	- But first we need to put our plans into the blade file 
+		<div class="form-group">
+			<label for="card-holder-name">
+				Pick the Plan
+			</label>
+			<select class="form-control" name="plan" id="subscription-plan">
+				@foreach ($plans as $plan)
+					<option value="{{$plan->id }}">{{ $plan->nickname }}</option>
+				@endforeach
+			</select>
+		</div>
+	- let get this value into our js code .
+		const plan = document.getElementById('subscription-plan').value;
+		
+	- Let's make the axios request 
+		axios.post('/payment/subscribe',{payment_method: setupIntent.payment_method,plan: plan})
+                        .then(resp => {
+                        console.log(resp.data);
+                    }).catch(e => {
+                        console.log(e);
+                    })
+	- In PaymentController subscribe method, let's do subscribe to user.
+		$paymentMethod = $request->payment_method;
+        $plan = $request->plan;
+        return auth()->user()->newSubscription('main',$plan)->create($paymentMethod);
+		
+		The first argument passed to the newSubscription method should be the name of the subscription. 
+		If your application only offers a single subscription, you might call this main or primary. 
+		The second argument is the specific Stripe / Braintree plan the user is subscribing to. 
+		This value should correspond to the plan's identifier in Stripe or Braintree.
+		
+
