@@ -1,0 +1,20 @@
+TDD =>  Test Driven development
+
+TDT => Test Driven Thinking
+------------------------------
+
+
+
+Testint:- 
+	Feature 
+	Unit
+		
+		
+	env file changes for Database
+	we alose put the database connection into phpunit.xml
+	
+	rename file for BookManagerTest.php
+	
+	add_book_to_library()
+	
+	clrl + alt + M => Extract Method 

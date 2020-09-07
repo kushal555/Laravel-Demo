@@ -1,0 +1,282 @@
+let's assume we need to create a contact package 
+	in that we are going to provide a form with name,email and message
+	
+that will send an email message and save the data to database.
+
+To create any package, we need at least two file 
+	composer.json 
+	serviceProvider file
+	
+	
+Let create a folder called package and insite this let's create a folder called contact-us
+
+now we need composer.json so let run the command "composer init"
+
+Just answer the question which asked by composer 
+Now we will have a composer json file in this folder 
+
+Now if you see the tinker package have the directory called "src" so let's craete that one into our project 
+
+let create serviceProvider file called ContactUsServiceProvider file 
+
+now it should have the namespace so let provide the namespace called "kushal\ContactUs"
+
+How our laravel application know this is the namespace
+
+going to back to "tinker" package we can see the composer json have autoload for psr4 so let's inject that code into our system to make the namespace working
+   "autoload": {
+        "psr-4": {
+            "Laravel\\Tinker\\": "src/"
+        }
+    },
+	
+Each serviceProvider must have 2 methods
+
+	public function boot(){}
+	public function register(){}
+	
+
+So we created the serviceProvider
+
+
+Now later on we will upload in on the package.com, but for now our development purpose we need to tel our project that hey plz use this package or add this package into project.
+
+
+	we need to add this into composer.json file in autoload-dev object.
+
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/",
+            "Kushal\\ContactUs\\": "package/contact-us/src"
+        }
+    },
+
+	
+	Now we need to reload the composer autoload file 
+		composer dump-autload
+
+
+	In our every project we always create route first, so let create
+	
+	public function boot(){
+		$this->loadRoutesFrom(__DIR__.'routes/web.php');
+	}
+	
+	
+	let's create a directory called "routes" and inside this create a file called "web.php"
+	
+	inside this, let's create a route 
+	
+	Route::get('kushal\contact-us',function(){
+		return 'We are in the package';
+	});
+	
+	let's try it into the browser.
+	
+	But its giving us the 404 error 
+	
+	Because we just tell to composer to include but we haven't register our package into "app.php" Service Provider array 
+	Once we upload to package.com then it will automatically loaded, bt for now we need to register it.
+	
+	
+	Kushal\ContactUs\ContactUsServiceProvider::class,
+
+
+	Now checked again to browser, Cool its seem like working.
+	
+	Now let's create a view for that, So we need to put the loadView function and tell to you provider to load our views
+	
+	$this->loadViewsFrom(__DIR__.'/views','contactUs');
+	
+	
+	now let's create a file inside the current directory eg. src/views/contact-us.blade.php   [views folder also need to create]
+	
+	Now put the form inside that.
+	
+	now let's change the route that will load this view .
+	
+	Route::get('kushal\contact-us',function(){
+		return view('contact-us-form');
+	});
+	
+	that will gives us error that view not found, because we are targetting the project view folder not package folder. so to do that change the views helper function.
+	
+	return views('ContactUs::contact-us-form');
+	
+	create a form for contact us form 
+	Name 
+	Email 
+	Message
+	
+	
+	Now let create a route to handle this request 
+	
+	Route::post('kushal\contact-us',function(Request $request){
+		return $request->all();
+	})->name('submit.contact');
+	
+	
+	Let's create a controller for that 
+	Create Directory called Http/Conrollers
+	
+	Let's create a controller Called "ContactUsController"
+	
+	put the two methods inside this
+	index 
+	sendEmail
+	
+	
+	Replace the web route with this routes 
+	
+	Route::get('kushal/contact-us','ContactUsController@index');
+    Route::post('kushal/contact-us','ContactUsController@sendEmail');
+	
+	Now let check its working or not 
+	by the way it will not work because it point our controller to default directory, so what I need to do 
+	
+	Put the namespance in front of every route
+	
+	Route::get('kushal/contact-us','Kushal\ContactUs\Http\Controllers\ContactUsController@index');
+    Route::post('kushal/contact-us','Kushal\ContactUs\Http\Controllers\ContactUsController@sendEmail');
+	
+	let check its working or not. and now its working 
+	bt we have the namespace in both files so let make it common
+	
+	create group for that
+	Route::group(['namespace'=> 'Kushal\ContactUs\Http\Controllers'],function(){
+	
+		Route::get('kushal/contact-us','ContactUsController@index');
+		Route::post('kushal/contact-us','ContactUsController@sendEmail');
+	
+	});
+	
+	now we decided to save it into the database so let's create a Model and Migration for that.
+	Again we will create for a project and then move it to our package
+	
+	
+		php artisan make:model ContactUs -m
+	
+	move this files into the package folder
+	
+	Let's allow the migration to user system 
+	
+	   $this->loadMigrationsFrom(__DIR__.'/database/migrations');
+	   
+	php artisan migrate
+	
+	
+	Now need to create a "fillable" in model
+	
+	Put the code into sendEmail method 
+	
+		ContactUs::Create($request->all());
+	
+	
+	Now we need to send an email so let's create an mailable class for that 
+	
+		php artisan make:mail ContactMail --markdown 
+	
+	move to our package directory and change the namespace
+	
+	now put the send email code into the function 
+	
+		Mail::to('kushalsuthar555@gmail.com')->send(new ContactMail($data));
+	
+	now we are sending the email, now what next. So you can see we are sending email to hardcoded email address.
+	
+	let's make dynamic so user can modify later when they will use our package.
+	
+	let create a config directory and inside that we will create a file called contactUs.php 
+	
+		$this->mergeConfigFrom(
+            __DIR__.'/config/contactUs.php', 'contactUs'
+        );
+	
+	Now, still this is not configurable. becuase we have this into our package file not dynamic. 
+	
+	So for that we need to publish our config file to project config directory. 
+	
+		$this->publishes([
+			__DIR__.'/config/contactUs.php' => config_path('contactUs.php'),
+		]);
+		
+	Now we can run the command called vendor:publish
+	
+		php artisan vendor:publish
+		
+	Now change some email and do the cache clear and try now sending an email 
+	
+	
+	===================================================================================
+	
+	
+	Now how can we make available package via composer 
+	
+	let's create an account on packgist.com using github 
+	
+	Click on submit from menu, that will required github repository. So let's create first this and push our code to github.
+	
+	Now put url of git repo into packagist and click on check , that will say you, have multiple package like the same, that is fine just hit submit
+	
+	Now you going to see the error for webhook that means your package will not update when you commit something on github.
+	
+	So let;s do that
+		If you directly create an account without using github, you should need to connect github account to packagist.
+		https://packagist.org/about#how-to-update-packages
+		
+		https://github.com/settings/connections/applications/a059f127e1c09c04aa5a
+		
+		
+		--------------------------------------------------------------------------------
+		Now let's create a new project and import our package in it
+		
+		
+		
+		=====================================================================================
+		
+		Make Auto Discover
+		------------------
+		
+		Add this line to composer.json of our package file
+		
+			"extra": {
+				"laravel": {
+					"providers": [
+						"Kushal\\ContactUs\\ContactUsServiceProvider"
+					]
+				}
+			}
+		
+		
+		
+		Now we need to add tag for github 
+		git tag v1.0.1
+		
+		git add .
+		
+		git commit -m "Make a package out discoverable"
+		
+		git push --tag
+		
+		git push
+		
+		
+		
+		// Now check the git repo there is tag tab..
+		
+		and now check for update in your project 
+		
+		
+	====================================================================================================
+	
+	Allow user to change the view as well.
+	
+	Put it into publish command
+	
+	
+	
+	Behat-Laravel-Extension
+	https://laracasts.com/lessons/laravel-5-and-behat-bffs
+	https://github.com/laracasts/Behat-Laravel-Extension
+	
+	https://matthewdaly.co.uk/blog/2017/02/18/integrating-behat-with-laravel/
